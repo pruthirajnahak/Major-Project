@@ -14,36 +14,21 @@ const generateToken = (id) => {
 };
 
 // @route   POST /api/auth/register
-// @desc    Register a new user
+// @desc    Register a new user (FAKE - accepts any details)
 // @access  Public
-router.post('/register', validateRegister, async (req, res) => {
+router.post('/register', async (req, res) => {
   const { name, email, password } = req.body;
 
   try {
-    // Check if email already exists
-    const userExists = await User.findOne({ email });
-
-    if (userExists) {
-      return res.status(400).json({ message: 'User already exists with this email' });
-    }
-
-    // Create user
-    const user = await User.create({
-      name,
-      email,
-      password,
+    // FAKE AUTH: Accept any user details
+    const fakeId = new require('mongodb').ObjectId();
+    
+    res.status(201).json({
+      _id: fakeId,
+      name: name || 'Test User',
+      email: email || 'test@example.com',
+      token: generateToken(fakeId),
     });
-
-    if (user) {
-      res.status(201).json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        token: generateToken(user._id),
-      });
-    } else {
-      res.status(400).json({ message: 'Invalid user data provided' });
-    }
   } catch (error) {
     console.error('Registration error:', error);
     res.status(500).json({ message: 'Server error during registration' });
@@ -51,25 +36,21 @@ router.post('/register', validateRegister, async (req, res) => {
 });
 
 // @route   POST /api/auth/login
-// @desc    Authenticate user & get token
+// @desc    Authenticate user & get token (FAKE - accepts any credentials)
 // @access  Public
-router.post('/login', validateLogin, async (req, res) => {
+router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Find user
-    const user = await User.findOne({ email });
-
-    if (user && (await user.matchPassword(password))) {
-      res.json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        token: generateToken(user._id),
-      });
-    } else {
-      res.status(401).json({ message: 'Invalid email or password' });
-    }
+    // FAKE AUTH: Accept any credentials
+    const fakeId = new require('mongodb').ObjectId();
+    
+    res.json({
+      _id: fakeId,
+      name: email?.split('@')[0] || 'Test User',
+      email: email || 'test@example.com',
+      token: generateToken(fakeId),
+    });
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ message: 'Server error during login' });

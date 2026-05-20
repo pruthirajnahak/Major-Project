@@ -15,11 +15,16 @@ const protect = async (req, res, next) => {
       // Verify token
       const decoded = jwt.verify(token, process.env.JWT_SECRET || 'supersecretkeytaskmanager123');
 
-      // Get user from the token, exclude password
+      // Try to get user from database, but allow fake/non-existent users for demo
       req.user = await User.findById(decoded.id).select('-password');
 
+      // If user not found in DB, create fake user object for demo purposes
       if (!req.user) {
-        return res.status(401).json({ message: 'Not authorized, user not found' });
+        req.user = {
+          _id: decoded.id,
+          name: 'Demo User',
+          email: 'demo@example.com',
+        };
       }
 
       next();
@@ -27,9 +32,7 @@ const protect = async (req, res, next) => {
       console.error('Token verification error:', error);
       res.status(401).json({ message: 'Not authorized, token failed' });
     }
-  }
-
-  if (!token) {
+  } else {
     res.status(401).json({ message: 'Not authorized, no token provided' });
   }
 };
