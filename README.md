@@ -141,3 +141,8 @@ All request payloads and response bodies utilize `application/json`. Private end
   - *Response*: `{ "message": "Task deleted successfully", "id": "<taskId>" }`
 - **DELETE `/api/tasks/completed/clear`** (Private):
   - *Response*: `{ "message": "Successfully deleted <count> completed tasks" }`
+
+
+
+
+  ...
